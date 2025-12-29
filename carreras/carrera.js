@@ -8,15 +8,19 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-const scoreEl = document.getElementById("score");
-
 let player = { x: canvas.width/2-25, y: canvas.height-120, w: 60, h: 60, vx: 0 };
 let obstacles = [];
+let krillList = [];
 let distance = 0;
+let krillCount = 0;
 let gameOver = false;
 
-// función para dibujar un pingüino
-function drawPenguin(x,y,w,h){
+// dibujar pingüino con trineo
+function drawPenguinConTrineo(x,y,w,h,colorTrineo){
+  // trineo
+  ctx.fillStyle = colorTrineo;
+  ctx.fillRect(x-10, y+h-10, w+20, 15);
+
   // cuerpo
   ctx.fillStyle = "black";
   ctx.beginPath();
@@ -52,13 +56,75 @@ function drawPenguin(x,y,w,h){
 }
 
 function drawPlayer() {
-  drawPenguin(player.x, player.y, player.w, player.h);
+  drawPenguinConTrineo(player.x, player.y, player.w, player.h, "royalblue");
 }
 
 function drawObstacles() {
   obstacles.forEach(o=>{
-    drawPenguin(o.x,o.y,o.w,o.h);
+    drawPenguinConTrineo(o.x,o.y,o.w,o.h,"red");
   });
+}
+
+// dibujar krill realista
+function drawKrill(x,y){
+  // cuerpo alargado
+  ctx.fillStyle = "#ff9999";
+  ctx.beginPath();
+  ctx.ellipse(x, y, 18, 6, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // segmentos
+  ctx.strokeStyle = "#cc6666";
+  ctx.lineWidth = 2;
+  for(let i=-12; i<=12; i+=6){
+    ctx.beginPath();
+    ctx.moveTo(x+i, y-6);
+    ctx.lineTo(x+i, y+6);
+    ctx.stroke();
+  }
+
+  // cabeza
+  ctx.fillStyle = "#ff6666";
+  ctx.beginPath();
+  ctx.arc(x+20, y, 6, 0, Math.PI*2);
+  ctx.fill();
+
+  // ojo
+  ctx.fillStyle = "black";
+  ctx.beginPath();
+  ctx.arc(x+22, y-2, 2, 0, Math.PI*2);
+  ctx.fill();
+
+  // antenas
+  ctx.strokeStyle = "#ff6666";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x+24, y-2);
+  ctx.lineTo(x+32, y-8);
+  ctx.moveTo(x+24, y);
+  ctx.lineTo(x+32, y+4);
+  ctx.stroke();
+}
+
+function drawKrillList(){
+  krillList.forEach(k=>{
+    drawKrill(k.x,k.y);
+  });
+}
+
+// tablero de puntuación
+function drawBoard(){
+  ctx.fillStyle = "rgba(0,0,50,0.7)";
+  ctx.fillRect(20, 20, 220, 70);
+
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(20, 20, 220, 70);
+
+  ctx.fillStyle = "white";
+  ctx.font = "20px sans-serif";
+  ctx.fillText("Distancia: " + distance, 40, 50);
+  ctx.fillText("Krill: " + krillCount, 40, 80);
 }
 
 function update() {
@@ -69,7 +135,7 @@ function update() {
   if(player.x<0) player.x=0;
   if(player.x+player.w>canvas.width) player.x=canvas.width-player.w;
 
-  // generar obstáculos (en cualquiera de los 3 carriles)
+  // generar obstáculos
   if(Math.random()<0.02){
     let lane = Math.floor(Math.random()*3);
     let laneWidth = canvas.width/3;
@@ -81,10 +147,23 @@ function update() {
     });
   }
 
+  // generar krill
+  if(Math.random()<0.01){
+    let lane = Math.floor(Math.random()*3);
+    let laneWidth = canvas.width/3;
+    krillList.push({
+      x: lane*laneWidth + laneWidth/2,
+      y: -50
+    });
+  }
+
   // mover obstáculos
   obstacles.forEach(o=>o.y+=6);
 
-  // colisiones
+  // mover krill
+  krillList.forEach(k=>k.y+=6);
+
+  // colisiones con obstáculos
   obstacles.forEach(o=>{
     if(player.x<o.x+o.w && player.x+player.w>o.x &&
        player.y<o.y+o.h && player.y+player.h>o.y){
@@ -92,23 +171,31 @@ function update() {
     }
   });
 
-  // limpiar obstáculos fuera
+  // colisiones con krill
+  krillList.forEach((k,i)=>{
+    if(player.x<k.x+10 && player.x+player.w>k.x-10 &&
+       player.y<k.y+10 && player.y+player.h>k.y-10){
+      krillCount++;
+      krillList.splice(i,1);
+    }
+  });
+
+  // limpiar fuera de pantalla
   obstacles = obstacles.filter(o=>o.y<canvas.height);
+  krillList = krillList.filter(k=>k.y<canvas.height);
 
   // distancia
   distance++;
-  scoreEl.textContent="Distancia: "+distance;
 }
 
 function draw() {
-  // fondo ártico
   ctx.fillStyle="#cceeff";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // ❌ ya no dibujamos las líneas punteadas de los carriles
-
   drawPlayer();
   drawObstacles();
+  drawKrillList();
+  drawBoard();
 
   if(gameOver){
     ctx.fillStyle="darkblue"; ctx.font="40px sans-serif";
@@ -126,14 +213,16 @@ loop();
 
 // controles
 document.addEventListener("keydown",e=>{
-  if(e.code==="ArrowLeft"){ player.vx=-6; }
-  if(e.code==="ArrowRight"){ player.vx=6; }
+  if(e.code==="ArrowLeft" || e.key==="a" || e.key==="A"){ player.vx=-6; }
+  if(e.code==="ArrowRight" || e.key==="d" || e.key==="D"){ player.vx=6; }
   if(gameOver && e.code==="Enter"){
     player={x:canvas.width/2-25,y:canvas.height-120,w:60,h:60,vx:0};
-    obstacles=[]; distance=0;
-    scoreEl.textContent="Distancia: 0"; gameOver=false;
+    obstacles=[]; krillList=[]; distance=0; krillCount=0;
+    gameOver=false;
   }
 });
 document.addEventListener("keyup",e=>{
-  if(e.code==="ArrowLeft"||e.code==="ArrowRight"){ player.vx=0; }
+  if(e.code==="ArrowLeft"||e.code==="ArrowRight"||e.key==="a"||e.key==="A"||e.key==="d"||e.key==="D"){ 
+    player.vx=0; 
+  }
 });
