@@ -15,25 +15,35 @@ let distance = 0;
 let krillCount = 0;
 let gameOver = false;
 
+// control de velocidad
+let baseSpeed = 5;        // velocidad normal de obstáculos/krill
+let boostSpeed = 10;      // velocidad con boost de obstáculos/krill
+let currentSpeed = baseSpeed;
+
+let boostActive = false;
+let boostTimer = 0;
+
+let playerBaseSpeed = 9;   // velocidad lateral normal del jugador
+let playerBoostSpeed = 15; // velocidad lateral con boost
+let currentPlayerSpeed = playerBaseSpeed;
+
+
+
 // dibujar pingüino con trineo
 function drawPenguinConTrineo(x,y,w,h,colorTrineo){
-  // trineo
   ctx.fillStyle = colorTrineo;
   ctx.fillRect(x-10, y+h-10, w+20, 15);
 
-  // cuerpo
   ctx.fillStyle = "black";
   ctx.beginPath();
   ctx.ellipse(x+w/2, y+h/2, w/2, h/2, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // panza blanca
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.ellipse(x+w/2, y+h/2+5, w/3, h/3, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // pico naranja
   ctx.fillStyle = "orange";
   ctx.beginPath();
   ctx.moveTo(x+w/2-10, y+h/2-5);
@@ -42,7 +52,6 @@ function drawPenguinConTrineo(x,y,w,h,colorTrineo){
   ctx.closePath();
   ctx.fill();
 
-  // ojos
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(x+w/2-10, y+h/2-15, 5, 0, Math.PI*2);
@@ -65,15 +74,13 @@ function drawObstacles() {
   });
 }
 
-// dibujar krill realista
+// dibujar krill
 function drawKrill(x,y){
-  // cuerpo alargado
   ctx.fillStyle = "#ff9999";
   ctx.beginPath();
   ctx.ellipse(x, y, 18, 6, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // segmentos
   ctx.strokeStyle = "#cc6666";
   ctx.lineWidth = 2;
   for(let i=-12; i<=12; i+=6){
@@ -83,19 +90,16 @@ function drawKrill(x,y){
     ctx.stroke();
   }
 
-  // cabeza
   ctx.fillStyle = "#ff6666";
   ctx.beginPath();
   ctx.arc(x+20, y, 6, 0, Math.PI*2);
   ctx.fill();
 
-  // ojo
   ctx.fillStyle = "black";
   ctx.beginPath();
   ctx.arc(x+22, y-2, 2, 0, Math.PI*2);
   ctx.fill();
 
-  // antenas
   ctx.strokeStyle = "#ff6666";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -112,20 +116,35 @@ function drawKrillList(){
   });
 }
 
-// tablero de puntuación
+// tablero
 function drawBoard(){
-  ctx.fillStyle = "rgba(0,0,50,0.7)";
-  ctx.fillRect(20, 20, 220, 70);
+  const boardWidth = 240;
+  const boardHeight = 90;
+  const boardX = (canvas.width - boardWidth) / 2; // centrado horizontal
+  const boardY = 20; // arriba
 
+  // fondo del tablero
+  ctx.fillStyle = "rgba(0,0,50,0.7)";
+  ctx.fillRect(boardX, boardY, boardWidth, boardHeight);
+
+  // borde
   ctx.strokeStyle = "white";
   ctx.lineWidth = 3;
-  ctx.strokeRect(20, 20, 220, 70);
+  ctx.strokeRect(boardX, boardY, boardWidth, boardHeight);
 
+  // texto
   ctx.fillStyle = "white";
   ctx.font = "20px sans-serif";
-  ctx.fillText("Distancia: " + distance, 40, 50);
-  ctx.fillText("Krill: " + krillCount, 40, 80);
+  ctx.fillText("Distancia: " + distance, boardX + 20, boardY + 30);
+  ctx.fillText("Krill: " + krillCount, boardX + 20, boardY + 60);
+
+  if(boostActive){
+    ctx.fillStyle = "yellow";
+    ctx.font = "16px sans-serif";
+    ctx.fillText("¡Acelerador activo!", boardX + 90, boardY + 60);
+  }
 }
+
 
 function update() {
   if(gameOver) return;
@@ -158,10 +177,10 @@ function update() {
   }
 
   // mover obstáculos
-  obstacles.forEach(o=>o.y+=6);
+  obstacles.forEach(o=>o.y+=currentSpeed);
 
   // mover krill
-  krillList.forEach(k=>k.y+=6);
+  krillList.forEach(k=>k.y+=currentSpeed);
 
   // colisiones con obstáculos
   obstacles.forEach(o=>{
@@ -177,8 +196,21 @@ function update() {
        player.y<k.y+10 && player.y+player.h>k.y-10){
       krillCount++;
       krillList.splice(i,1);
+
+      // activar boost cada 5 krill
+      if(krillCount % 5 === 0){
+        boostActive = true;
+        currentSpeed = boostSpeed;
+        boostTimer = Date.now();
+      }
     }
   });
+
+  // controlar duración del boost
+  if(boostActive && Date.now() - boostTimer > 10000){
+    boostActive = false;
+    currentSpeed = baseSpeed;
+  }
 
   // limpiar fuera de pantalla
   obstacles = obstacles.filter(o=>o.y<canvas.height);
@@ -213,16 +245,20 @@ loop();
 
 // controles
 document.addEventListener("keydown",e=>{
-  if(e.code==="ArrowLeft" || e.key==="a" || e.key==="A"){ player.vx=-6; }
-  if(e.code==="ArrowRight" || e.key==="d" || e.key==="D"){ player.vx=6; }
+  if(e.code==="ArrowLeft" || e.key==="a" || e.key==="A"){ player.vx = -currentPlayerSpeed; }
+  if(e.code==="ArrowRight" || e.key==="d" || e.key==="D"){ player.vx = currentPlayerSpeed; }
   if(gameOver && e.code==="Enter"){
     player={x:canvas.width/2-25,y:canvas.height-120,w:60,h:60,vx:0};
     obstacles=[]; krillList=[]; distance=0; krillCount=0;
     gameOver=false;
+    currentSpeed = baseSpeed;
+    boostActive = false;
   }
 });
-document.addEventListener("keyup",e=>{
-  if(e.code==="ArrowLeft"||e.code==="ArrowRight"||e.key==="a"||e.key==="A"||e.key==="d"||e.key==="D"){ 
-    player.vx=0; 
+
+document.addEventListener("keyup", e => {
+  if(e.code==="ArrowLeft" || e.code==="ArrowRight" || e.key==="a" || e.key==="A" || e.key==="d" || e.key==="D"){ 
+    player.vx = 0; 
   }
 });
+
