@@ -1,3 +1,4 @@
+//menu que el usuario puede mover 
 const menu = document.getElementById("another-games");
 const icon = document.getElementById("menu-icon");
 
@@ -308,6 +309,7 @@ obstacles.forEach(o => {
     player.y + player.h > o.y
   ) {
     gameOver = true;
+    onGameOver();
   }
 
   if (!o.passed && o.x + o.w < player.x) {
@@ -358,6 +360,7 @@ document.addEventListener("keydown", e => {
   if (e.code === "Space" && !player.jumping && !gameOver) {
     player.vy = jump;
     player.jumping = true;
+    onJump();
   }
   if (gameOver && e.code === "Enter") {
     player = { x: 80, y: groundY - 40, vy: 0, w: 40, h: 40, jumping: false };
@@ -372,5 +375,72 @@ canvas.addEventListener("click", () => {
   if (!player.jumping && !gameOver) {
     player.vy = jump;
     player.jumping = true;
+    onJump();
+  }
+});
+
+
+//Música del juego
+let soundOn = true;
+
+// Función auxiliar para reproducir un tono
+function playTone(freq, duration, type = "sine", volume = 0.08) {
+  if (!soundOn) return;
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.value = volume;
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.start();
+  osc.stop(ac.currentTime + duration);
+  setTimeout(() => ac.close(), duration * 1000 + 200);
+}
+
+/// --- Sonido de salto (menos agudo, más suave) ---
+function onJump() {
+  if (!soundOn) return;
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+
+  // Dos notas ascendentes rápidas pero más graves
+  [350, 550].forEach((freq, i) => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = "triangle";
+    osc.frequency.value = freq;
+    gain.gain.value = 0.08;
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.start(ac.currentTime + i * 0.05);
+    osc.stop(ac.currentTime + i * 0.05 + 0.15);
+  });
+
+  setTimeout(() => ac.close(), 500);
+}
+
+// --- Sonido de Game Over (descendente y calmado) ---
+function onGameOver() {
+  if (!soundOn) return;
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  [440, 330, 220].forEach((freq, i) => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.value = 0.07;
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.start(ac.currentTime + i * 0.5);
+    osc.stop(ac.currentTime + i * 0.5 + 0.6);
+  });
+  setTimeout(() => ac.close(), 2500);
+}
+
+// --- Control con tecla M para activar/desactivar sonido ---
+document.addEventListener("keydown", e => {
+  if (e.code === "KeyM") {
+    soundOn = !soundOn;
   }
 });
