@@ -1,3 +1,4 @@
+//menu general que se puede mover
 const menu = document.getElementById("another-games");
 const icon = document.getElementById("menu-icon");
 
@@ -88,7 +89,6 @@ let boostTimer = 0;
 let playerBaseSpeed = 9;   // velocidad lateral normal del jugador
 let playerBoostSpeed = 15; // velocidad lateral con boost
 let currentPlayerSpeed = playerBaseSpeed;
-
 
 
 // dibujar pingüino con trineo
@@ -249,6 +249,7 @@ function update() {
     if(player.x<o.x+o.w && player.x+player.w>o.x &&
        player.y<o.y+o.h && player.y+player.h>o.y){
       gameOver=true;
+      onGameOver();
     }
   });
 
@@ -258,12 +259,14 @@ function update() {
        player.y<k.y+10 && player.y+player.h>k.y-10){
       krillCount++;
       krillList.splice(i,1);
+      onKrillCollected();
 
       // activar boost cada 5 krill
       if(krillCount % 5 === 0){
         boostActive = true;
         currentSpeed = boostSpeed;
         boostTimer = Date.now();
+        onBoostActivated();
       }
     }
   });
@@ -315,6 +318,8 @@ document.addEventListener("keydown",e=>{
     gameOver=false;
     currentSpeed = baseSpeed;
     boostActive = false;
+
+    onGameStart();
   }
 });
 
@@ -324,3 +329,73 @@ document.addEventListener("keyup", e => {
   }
 });
 
+// --- Sistema de sonido minimalista con AudioContext ---
+let soundOn = true;
+
+// Función auxiliar para reproducir un tono
+function playTone(freq, duration, type = "sine", volume = 0.08) {
+  if (!soundOn) return;
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.value = volume;
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.start();
+  osc.stop(ac.currentTime + duration);
+  setTimeout(() => ac.close(), duration * 1000 + 200);
+}
+
+// --- Sonido al recoger krill (suave y alegre) ---
+function onKrillCollected() {
+  playTone(1000, 0.15, "sine", 0.1);   // nota aguda corta
+  playTone(1500, 0.1, "triangle", 0.08); // segunda nota brillante
+}
+
+// --- Sonido de boost activado (rápido y energético) ---
+function onBoostActivated() {
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  [600, 900, 1200].forEach((freq, i) => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = "square";
+    osc.frequency.value = freq;
+    gain.gain.value = 0.1;
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.start(ac.currentTime + i * 0.2);
+    osc.stop(ac.currentTime + i * 0.2 + 0.25);
+  });
+  setTimeout(() => ac.close(), 1500);
+}
+
+// --- Sonido de Game Over (tranquilo y descendente) ---
+function onGameOver() {
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  [440, 330, 220].forEach((freq, i) => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.value = 0.07;
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.start(ac.currentTime + i * 0.5);
+    osc.stop(ac.currentTime + i * 0.5 + 0.6);
+  });
+  setTimeout(() => ac.close(), 2500);
+}
+
+// --- Reinicio del juego (silencioso, pero puedes añadir sonido si quieres) ---
+function onGameStart() {
+  // Aquí podrías poner un sonido de inicio si lo deseas
+}
+
+// --- Control con tecla M para activar/desactivar sonido ---
+document.addEventListener("keydown", e => {
+  if (e.code === "KeyM") {
+    soundOn = !soundOn;
+  }
+});
