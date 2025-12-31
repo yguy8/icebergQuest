@@ -233,26 +233,45 @@ function update() {
   });
 
   // colisiones
-  entities.forEach((f,i)=>{
-  if(hook.active &&
-     hook.x<hook.x+hook.w && hook.x+hook.w>f.x &&
-     hook.y<hook.y+hook.h && hook.y+hook.h>f.y){
-    if(f.type==="fish"){ 
-      score+=10; 
-      goodSound();
-      floatTexts.push({ text:"+10", x:f.x, y:f.y, color:"lime", life:60 });
+entities.forEach((f,i)=>{
+  if(hook.active){
+    // Rectángulo del hook
+    const hookLeft   = hook.x;
+    const hookRight  = hook.x + hook.w;
+    const hookTop    = hook.y;
+    const hookBottom = hook.y + hook.h;
+
+    // Rectángulo de la entidad
+    const fLeft   = f.x;
+    const fRight  = f.x + f.w;
+    const fTop    = f.y;
+    const fBottom = f.y + f.h;
+
+    // Checar colisión (AABB)
+    const collision = hookLeft < fRight &&
+                      hookRight > fLeft &&
+                      hookTop < fBottom &&
+                      hookBottom > fTop;
+
+    if(collision){
+      if(f.type === "fish"){ 
+        score += 10; 
+        goodSound();
+        floatTexts.push({ text:"+10", x:f.x, y:f.y, color:"#2cbb09ff", life:60 });
+      } else { 
+        score -= 5; 
+        if(score < 0) score = 0; //evita negativos
+        badSound();
+        floatTexts.push({ text:"-5", x:f.x, y:f.y, color:"#bd0000ff", life:60 });
+      }
+      scoreEl.textContent = "Puntos: " + score;
+      entities.splice(i,1);
+      hook.active = false; 
+      hook.y = 0; 
+      hook.vy = 0;
     }
-    else { 
-      score-=5; 
-      badSound();
-      floatTexts.push({ text:"-5", x:f.x, y:f.y, color:"red", life:60 });
-    }
-    scoreEl.textContent="Puntos: "+score;
-    entities.splice(i,1);
-    hook.active=false; hook.y=0; hook.vy=0;
   }
 });
-
 
   // actualizar textos flotantes
 floatTexts.forEach(t => {
@@ -376,17 +395,33 @@ function loop(){
 }
 loop();
 
-//controles
+// controles
 document.addEventListener("keydown", e => {
-  if(e.code==="ArrowLeft" || e.key==="a"){ hook.x-=20; }
-  if(e.code==="ArrowRight" || e.key==="d"){ hook.x+=20; }
-  if((e.code==="Space" || e.key===" ") && !hook.active){
-    hook.active=true; hook.vy=5;
+  // mover caña a la izquierda/derecha
+  if(e.code==="ArrowLeft" || e.key==="a"){ hook.x -= 20; }
+  if(e.code==="ArrowRight" || e.key==="d"){ hook.x += 20; }
+
+  // mover caña hacia arriba
+  if(e.code==="ArrowUp" || e.key==="w"){
+    hook.active = true;
+    hook.vy = -5;   // velocidad hacia arriba
   }
+
+  // mover caña hacia abajo
+  if(e.code==="ArrowDown" || e.key==="s"){
+    hook.active = true;
+    hook.vy = 5;    // velocidad hacia abajo
+  }
+
+  // espacio: lanzar caña hasta el fondo
+  if(e.code==="Space" || e.key===" "){
+    hook.active = true;
+    hook.vy = 10;   // baja rápido
+  }
+
   // Toggle sonido con la tecla M
   if(e.code==="KeyM" || e.key==="m"){
     soundOn = !soundOn;
     console.log("Sonido: " + (soundOn ? "ON" : "OFF"));
   }
 });
-
