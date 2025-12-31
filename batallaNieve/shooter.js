@@ -61,7 +61,7 @@ icon.addEventListener("click", () => {
   }
 });
 
-//canvas del juego 
+// --- Canvas del juego ---
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -83,31 +83,36 @@ let gameOver = false;
 // posición de la barrera
 const barrierX = 150;
 
-// Dibujar pingüino (jugador)
+// --- Dibujar pingüino (jugador) ---
 function drawPlayer() {
   let p = player;
   ctx.fillStyle="black";
   ctx.beginPath();
   ctx.ellipse(p.x+p.w/2, p.y+p.h/2, p.w/2, p.h/2, 0, 0, Math.PI*2);
   ctx.fill();
+
   ctx.fillStyle="white";
   ctx.beginPath();
   ctx.ellipse(p.x+p.w/2, p.y+p.h/2+10, p.w/3, p.h/3, 0, 0, Math.PI*2);
   ctx.fill();
+
   ctx.fillStyle="black";
   ctx.beginPath();
   ctx.arc(p.x+p.w/2, p.y+15, p.w/3, 0, Math.PI*2);
   ctx.fill();
+
   ctx.fillStyle="white";
   ctx.beginPath();
   ctx.arc(p.x+p.w/2-8, p.y+12, 5, 0, Math.PI*2);
   ctx.arc(p.x+p.w/2+8, p.y+12, 5, 0, Math.PI*2);
   ctx.fill();
+
   ctx.fillStyle="black";
   ctx.beginPath();
   ctx.arc(p.x+p.w/2-8, p.y+12, 2, 0, Math.PI*2);
   ctx.arc(p.x+p.w/2+8, p.y+12, 2, 0, Math.PI*2);
   ctx.fill();
+
   ctx.fillStyle="orange";
   ctx.beginPath();
   ctx.moveTo(p.x+p.w/2-5, p.y+20);
@@ -117,7 +122,7 @@ function drawPlayer() {
   ctx.fill();
 }
 
-// Dibujar bolas de nieve
+// --- Dibujar bolas de nieve ---
 function drawBullets() {
   ctx.fillStyle="white";
   bullets.forEach(b=>{
@@ -127,7 +132,7 @@ function drawBullets() {
   });
 }
 
-// Dibujar cormorán imperial
+// --- Dibujar cormorán imperial ---
 function drawEnemies() {
   enemies.forEach(e=>{
     const cx = e.x + e.w/2;
@@ -170,7 +175,7 @@ function drawEnemies() {
     ctx.closePath();
     ctx.fill();
 
-    // alas más pequeñas y pegadas al cuerpo
+    // alas pequeñas pegadas al cuerpo
     ctx.fillStyle="black";
     ctx.beginPath();
     ctx.ellipse(cx - (e.w/2.2), cy, 8, 15, 0, 0, Math.PI*2); // ala izquierda
@@ -186,16 +191,54 @@ function drawEnemies() {
   });
 }
 
+// --- Copos de nieve ---
+let snowflakes = [];
+function spawnSnowflake() {
+  snowflakes.push({
+    x: Math.random()*canvas.width,
+    y: -10,
+    r: Math.random()*3+2,
+    vy: Math.random()*1+0.5
+  });
+}
+setInterval(spawnSnowflake, 200);
 
-// Actualizar lógica
+function updateSnowflakes() {
+  snowflakes.forEach((s,i)=>{
+    s.y += s.vy;
+    if(s.y>canvas.height) snowflakes.splice(i,1);
+  });
+}
+function drawSnowflakes() {
+  ctx.fillStyle="white";
+  snowflakes.forEach(s=>{
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+  });
+}
+
+// --- Combo especial ---
+let comboActive = false;
+let comboTimer = 0;
+let enemiesKilled = 0;
+
+function activateCombo() {
+  comboActive = true;
+  comboTimer = Date.now();
+}
+
+// --- Actualizar lógica ---
 function update() {
   if(gameOver) return;
 
+  // movimiento jugador
   player.y += player.vy;
   if(player.y<0) player.y=0;
   if(player.y+player.h>canvas.height) player.y=canvas.height-player.h;
   if(player.x<barrierX) player.x=barrierX;
 
+  // balas
   bullets.forEach((b,i)=>{
     b.x+=8;
     if(b.x>canvas.width) bullets.splice(i,1);
@@ -205,12 +248,24 @@ function update() {
         enemies.splice(j,1);
         bullets.splice(i,1);
         score++;
+        enemiesKilled++;
         scoreEl.textContent=score;
-        onEnemyHit(); // sonido al eliminar enemigo
+        onEnemyHit();
+
+        // activar combo cada 10 enemigos
+        if(enemiesKilled % 10 === 0){
+          activateCombo();
+        }
       }
     });
   });
 
+  // desactivar combo después de 10 segundos
+  if(comboActive && Date.now()-comboTimer > 3000){
+    comboActive = false;
+  }
+
+  // enemigos
   if(Math.random()<0.02){
     let size=50;
     enemies.push({x:canvas.width, y:Math.random()*(canvas.height-80), w:size, h:size});
@@ -220,7 +275,7 @@ function update() {
     if(e.x+e.w<0) enemies.splice(i,1);
     if(e.x<barrierX){
       gameOver=true;
-      onGameOver(); // sonido game over
+      onGameOver();
     }
     if(player.x<e.x+e.w && player.x+player.w>e.x &&
        player.y<e.y+e.h && player.y+player.h>e.y){
@@ -228,12 +283,16 @@ function update() {
       onGameOver();
     }
   });
+
+  updateSnowflakes();
 }
 
-// Dibujar todo
+// --- Dibujar todo ---
 function draw() {
   ctx.fillStyle="#001f3f";
   ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  drawSnowflakes(); // fondo con copos
 
   ctx.fillStyle="lightblue";
   ctx.fillRect(barrierX-5,0,10,canvas.height);
@@ -250,6 +309,7 @@ function draw() {
   }
 }
 
+// --- Loop principal ---
 function loop(){
   update(); draw();
   requestAnimationFrame(loop);
@@ -274,16 +334,19 @@ function playTone(freq, duration, type = "sine", volume = 0.08) {
   setTimeout(() => ac.close(), duration * 1000 + 200);
 }
 
+// --- Sonido al disparar bola de nieve ---
 function onShoot() {
   playTone(800, 0.1, "square", 0.1);
   playTone(1200, 0.08, "triangle", 0.08);
 }
 
+// --- Sonido al eliminar enemigo ---
 function onEnemyHit() {
   playTone(1000, 0.15, "sine", 0.1);
   playTone(1500, 0.1, "triangle", 0.08);
 }
 
+// --- Sonido de Game Over ---
 function onGameOver() {
   const ac = new (window.AudioContext || window.webkitAudioContext)();
   [440, 330, 220].forEach((freq, i) => {
@@ -300,29 +363,41 @@ function onGameOver() {
   setTimeout(() => ac.close(), 2000);
 }
 
-// Toggle sonido con tecla M
+// --- Toggle sonido con tecla M ---
 document.addEventListener("keydown", e => {
   if (e.code === "KeyM") {
     soundOn = !soundOn;
   }
 });
 
-// Controles
-document.addEventListener("keydown",e=>{
+// --- Controles ---
+document.addEventListener("keydown", e => {
   if(e.code==="ArrowUp" || e.key==="w"){ player.vy=-6; }
   if(e.code==="ArrowDown" || e.key==="s"){ player.vy=6; }
   if(e.code==="Space"){ 
-    bullets.push({x:player.x+player.w,y:player.y+player.h/2,r:6}); 
+    if(comboActive){
+      // disparo múltiple en abanico
+      for(let i=0;i<5;i++){
+        bullets.push({
+          x:player.x+player.w,
+          y:player.y+player.h/2 + (i-2)*8,
+          r:6
+        });
+      }
+    } else {
+      bullets.push({x:player.x+player.w,y:player.y+player.h/2,r:6});
+    }
     onShoot(); // sonido disparo
   }
   if(gameOver && e.code==="Enter"){
     player={x:80,y:canvas.height/2,w:40,h:60,vy:0};
-    bullets=[]; enemies=[]; score=0;
+    bullets=[]; enemies=[]; score=0; enemiesKilled=0;
     scoreEl.textContent=0; gameOver=false;
+    comboActive=false;
   }
 });
 
-document.addEventListener("keyup",e=>{
+document.addEventListener("keyup", e => {
   if(e.code==="ArrowUp"||e.code==="ArrowDown"||e.key==="w"||e.key==="s"){ 
     player.vy=0; 
   }
