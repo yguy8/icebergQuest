@@ -61,6 +61,84 @@ icon.addEventListener("click", () => {
   }
 });
 
+//instrucciones del juego 
+const instructionsMenu = document.getElementById("instructions-menu");
+const instructionsIcon = document.getElementById("instructions-icon");
+
+let offsetX2, offsetY2, isDragging2 = false;
+
+// --- Drag con mouse ---
+instructionsMenu.addEventListener("mousedown", (e) => {
+  if (e.target.closest("#instructions-icon")) return; // no arrastrar si clic en icono
+  isDragging2 = true;
+  offsetX2 = e.clientX - instructionsMenu.offsetLeft;
+  offsetY2 = e.clientY - instructionsMenu.offsetTop;
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (isDragging2) {
+    instructionsMenu.style.left = (e.clientX - offsetX2) + "px";
+    instructionsMenu.style.top = (e.clientY - offsetY2) + "px";
+  }
+});
+
+document.addEventListener("mouseup", () => {
+  isDragging2 = false;
+});
+
+// --- Drag con touch ---
+instructionsMenu.addEventListener("touchstart", (e) => {
+  if (e.target.closest("#instructions-icon")) return;
+  isDragging2 = true;
+  const touch = e.touches[0];
+  offsetX2 = touch.clientX - instructionsMenu.offsetLeft;
+  offsetY2 = touch.clientY - instructionsMenu.offsetTop;
+});
+
+document.addEventListener("touchmove", (e) => {
+  if (isDragging2) {
+    const touch = e.touches[0];
+    instructionsMenu.style.left = (touch.clientX - offsetX2) + "px";
+    instructionsMenu.style.top = (touch.clientY - offsetY2) + "px";
+  }
+});
+
+document.addEventListener("touchend", () => {
+  isDragging2 = false;
+});
+
+// --- Toggle expand/collapse ---
+instructionsIcon.addEventListener("click", () => {
+  instructionsMenu.classList.toggle("expanded");
+
+  if (instructionsMenu.classList.contains("expanded")) {
+    // SVG abierto (outline libro)
+    instructionsIcon.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+           viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="2" 
+           stroke-linecap="round" stroke-linejoin="round" 
+           class="icon icon-tabler icons-tabler-outline icon-tabler-book">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <path d="M3 6l0 13" />
+        <path d="M12 6l0 13" />
+        <path d="M21 6l0 13" />
+      </svg>
+    `;
+  } else {
+    // SVG cerrado (libro lleno)
+    instructionsIcon.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+           viewBox="0 0 24 24" fill="#c8ff00" 
+           class="icon icon-tabler icons-tabler-filled icon-tabler-book">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M21.5 5.134a1 1 0 0 1 .493 .748l.007 .118v13a1 1 0 0 1 -1.5 .866a8 8 0 0 0 -7.5 -.266v-15.174a10 10 0 0 1 8.5 .708m-10.5 -.707l.001 15.174a8 8 0 0 0 -7.234 .117l-.327 .18l-.103 .044l-.049 .016l-.11 .026l-.061 .01l-.117 .006h-.042l-.11 -.012l-.077 -.014l-.108 -.032l-.126 -.056l-.095 -.056l-.089 -.067l-.06 -.056l-.073 -.082l-.064 -.089l-.022 -.036l-.032 -.06l-.044 -.103l-.016 -.049l-.026 -.11l-.01 -.061l-.004 -.049l-.002 -13.068a1 1 0 0 1 .5 -.866a10 10 0 0 1 8.5 -.707" />
+      </svg>
+    `;
+  }
+});
+
 // Canvas y contexto
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
