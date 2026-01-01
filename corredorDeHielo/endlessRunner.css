@@ -156,7 +156,9 @@ html, body {
   left: 50%;
   transform: translateX(-50%);
   color: white;
+  background-color: var(--fondo-menu);
   font-size: 24px;
+  padding: 10px;
   font-family: sans-serif;
 }
 

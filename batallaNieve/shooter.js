@@ -327,7 +327,7 @@ function update() {
         bullets.splice(i,1);
         score++;
         enemiesKilled++;
-        scoreEl.textContent=score;
+        scoreEl.textContent= "Puntos: " + score;
         onEnemyHit();
 
         // activar combo cada 10 enemigos

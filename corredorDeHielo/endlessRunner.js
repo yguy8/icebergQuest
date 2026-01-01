@@ -457,7 +457,6 @@ canvas.addEventListener("click", () => {
   }
 });
 
-
 //Música del juego
 let soundOn = true;
 

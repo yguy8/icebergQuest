@@ -265,7 +265,7 @@ function drawBoard(){
   const boardY = 20; // arriba
 
   // fondo del tablero
-  ctx.fillStyle = "rgba(0,0,50,0.7)";
+  ctx.fillStyle = "rgba(1, 1, 3, 0.7)";
   ctx.fillRect(boardX, boardY, boardWidth, boardHeight);
 
   // borde
@@ -281,7 +281,7 @@ function drawBoard(){
 
   if(boostActive){
     ctx.fillStyle = "yellow";
-    ctx.font = "16px Verdana, sans-serif";
+    ctx.font = "10px Verdana, sans-serif ";
     ctx.fillText("¡Acelerador activo!", boardX + 90, boardY + 60);
   }
 }
@@ -469,7 +469,6 @@ function onGameOver() {
 
 // --- Reinicio del juego (silencioso, pero puedes añadir sonido si quieres) ---
 function onGameStart() {
-  // Aquí podrías poner un sonido de inicio si lo deseas
 }
 
 // --- Control con tecla M para activar/desactivar sonido ---

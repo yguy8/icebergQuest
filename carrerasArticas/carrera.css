@@ -155,7 +155,6 @@ html, body {
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  color: darkblue;
   font-size: 24px;
   font-family: sans-serif;
 }
