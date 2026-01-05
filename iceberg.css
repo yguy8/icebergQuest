@@ -7,6 +7,8 @@
     --azul-chicle:#58c0fd;
     --azul-cielo:#b3f0ff;
     --hielo:#b3f0ff;
+    --amarillo-pingüino:#f0ec1f;
+    --naranja:#f0a824;
 }
 
 body {
@@ -38,6 +40,66 @@ header p{
     color:var(--hielo);
 }
 
+/* === NAV BAR === */
+nav {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(6px);
+    border-bottom: 2px solid var(--azul-chicle);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    box-shadow: 0 0 15px var(--azul-marino);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    position: relative;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--hielo);
+    font-weight: bold;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+nav ul li a:hover {
+    color: var(--amarillo-pingüino);
+    transform: scale(1.1);
+    text-shadow: 0 0 20px var(--azul-profundo), 0 0 20px var(--gris-polar);
+}
+
+/* Línea brillante debajo al hacer hover */
+nav ul li a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    transition: width 0.3s ease;
+}
+
+nav ul li a:hover::after {
+    width: 100%;
+}
+
 /* Contenedor de cubos */
 .ice-cubes {
     display: flex;
@@ -64,6 +126,74 @@ header p{
 @keyframes float {
     0%, 100% { transform: translateY(0) rotate(10deg); }
     50% { transform: translateY(-10px) rotate(10deg); }
+}
+
+
+/* === MAIN AVENTURA === */
+#aventura {
+    padding: 60px 20px;
+    background: linear-gradient(180deg, var(--azul-profundo) 0%, var(--azul-marino) 100%);
+    color: var(--amarillo-pingüino);
+    text-align: center;
+}
+
+/* Secciones dentro del main */
+#aventura section {
+    margin: 40px auto;
+    max-width: 900px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid var(--azul-chicle);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(88,192,253,0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto hover para dar vida */
+#aventura section:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 25px var(--azul-cielo), 0 0 40px var(--azul-chicle);
+}
+
+/* Títulos */
+#aventura h2, 
+#aventura h3 {
+    color: var(--naranja);
+    margin-bottom: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Texto */
+#aventura p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--hielo);
+}
+
+/* Lista de juegos */
+#aventura ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#aventura ul li {
+    background: rgba(255,255,255,0.08);
+    margin: 12px 0;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border-left: 4px solid var(--azul-chicle);
+    text-align: left;
+    transition: background 0.3s ease;
+}
+
+#aventura ul li:hover {
+    background: rgba(88,192,253,0.15);
+}
+
+/* Resaltar nombres de juegos */
+#aventura ul li strong {
+    color: var(--azul-cielo);
 }
 
 /* === CARTAS DE JUEGOS === */
@@ -154,10 +284,69 @@ svg{
     box-shadow: 0 0 15px var(--azul-cielo), 0 0 25px var(--azul-chicle);
 }
 
+/* === SECCIÓN PINGÜINOS === */
+.pinguinos {
+    padding: 60px 20px;
+    background: linear-gradient(180deg, var(--azul-marino) 0%, var(--azul-profundo) 100%);
+    color: var(--hielo);
+    text-align: center;
+}
+
+.pinguinos h2 {
+    font-size: 2.5em;
+    color: var(--azul-chicle);
+    text-shadow: 0 0 10px var(--azul-cielo), 0 0 20px var(--azul-chicle);
+    margin-bottom: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.info-card {
+    background: rgba(255,255,255,0.08);
+    border: 2px solid var(--azul-chicle);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(88,192,253,0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px var(--azul-cielo), 0 0 30px var(--azul-chicle);
+}
+
+.info-card h3 {
+    color: var(--azul-cielo);
+    margin-bottom: 10px;
+}
+
 /* === FOOTER === */
 footer {
-    margin-top: 50px;
-    padding: 20px;
-    font-size: 0.9em;
+    background: var(--azul-profundo);
+    padding: 30px 20px;
+    text-align: center;
+    border-top: 2px solid var(--azul-chicle);
+}
+
+.footer-links a {
     color: var(--hielo);
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--azul-chicle);
+    text-shadow: 0 0 10px var(--azul-cielo);
+}
+
+.credits {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: var(--azul-opaco);
 }

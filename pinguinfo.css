@@ -1,0 +1,131 @@
+
+:root {
+    --negro:#1a1a1a;
+    --blanco:#fdfdfd;
+    --gris:#e0e0e0;
+    --amarillo:#f5c518;   /* tono cálido, vibrante */
+    --naranja:#ff7f50;    /* coral/naranja suave */
+    --azul-acento:#58c0fd; /* solo como detalle */
+}
+
+/* === General === */
+body {
+    margin: 0;
+    font-family: 'Georgia', serif; /* estilo editorial */
+    background-color: var(--blanco);
+    color: var(--negro);
+    line-height: 1.6;
+}
+
+/* === Header === */
+header {
+    background: var(--negro);
+    padding: 40px 20px;
+    text-align: center;
+    border-bottom: 6px solid var(--amarillo);
+}
+
+header h1 {
+    font-size: 3em;
+    color: var(--amarillo);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.2em;
+    color: var(--gris);
+}
+
+/* === Nav === */
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--blanco);
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: var(--naranja);
+}
+
+/* === Main estilo revista === */
+#pinguinos {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Cada sección como artículo */
+#pinguinos section {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* texto - foto */
+    gap: 30px;
+    margin-bottom: 60px;
+    background: var(--gris);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+/* Títulos */
+#pinguinos section h2 {
+    grid-column: 1 / -1;
+    font-size: 2em;
+    color: var(--naranja);
+    border-bottom: 2px solid var(--amarillo);
+    margin-bottom: 15px;
+    font-family: 'Verdana', sans-serif;
+}
+
+/* Texto */
+#pinguinos section p {
+    font-size: 1.1em;
+    color: var(--negro);
+}
+
+/* Imagen estilo revista */
+#pinguinos section img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 10px var(--negro);
+    transition: transform 0.3s ease;
+}
+
+#pinguinos section img:hover {
+    transform: scale(1.05);
+}
+
+/* === Footer === */
+footer {
+    background: var(--negro);
+    padding: 30px 20px;
+    text-align: center;
+    border-top: 4px solid var(--amarillo);
+}
+
+.footer-links a {
+    color: var(--blanco);
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--naranja);
+}
+
+.credits {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: var(--gris);
+}
