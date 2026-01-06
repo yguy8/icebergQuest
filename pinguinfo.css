@@ -1,18 +1,17 @@
-
 :root {
     --negro:#1a1a1a;
     --blanco:#fdfdfd;
     --gris:#e0e0e0;
-    --amarillo:#f5c518;   /* tono cálido, vibrante */
+    --amarillo:#f5c518;   /* cálido, vibrante */
     --naranja:#ff7f50;    /* coral/naranja suave */
-    --azul-acento:#58c0fd; /* solo como detalle */
+    --azul-profundo:#304788;
 }
 
 /* === General === */
 body {
     margin: 0;
     font-family: 'Georgia', serif; /* estilo editorial */
-    background-color: var(--blanco);
+    background-color: var(--azul-profundo);
     color: var(--negro);
     line-height: 1.6;
 }
@@ -54,22 +53,16 @@ nav ul li a {
     transition: color 0.3s ease;
 }
 
-nav ul li a:hover {
-    color: var(--naranja);
-}
+nav ul li a:hover { color: var(--naranja); }
 
-/* === Main estilo revista === */
+/* === Main === */
 #pinguinos {
     max-width: 1000px;
     margin: 40px auto;
     padding: 0 20px;
 }
 
-/* Cada sección como artículo */
 #pinguinos section {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* texto - foto */
-    gap: 30px;
     margin-bottom: 60px;
     background: var(--gris);
     border-radius: 10px;
@@ -79,7 +72,6 @@ nav ul li a:hover {
 
 /* Títulos */
 #pinguinos section h2 {
-    grid-column: 1 / -1;
     font-size: 2em;
     color: var(--naranja);
     border-bottom: 2px solid var(--amarillo);
@@ -93,16 +85,102 @@ nav ul li a:hover {
     color: var(--negro);
 }
 
-/* Imagen estilo revista */
-#pinguinos section img {
+/* === Contenido texto + imagen === */
+.content {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+.text { flex: 1.2; }
+.image { flex: 1; }
+
+.image img {
     width: 100%;
     border-radius: 8px;
     box-shadow: 0 0 10px var(--negro);
     transition: transform 0.3s ease;
 }
+.image img:hover { transform: scale(1.05); }
 
-#pinguinos section img:hover {
-    transform: scale(1.05);
+/* Alternar orden */
+.reverse .content { flex-direction: row-reverse; }
+
+/* === Carrusel de especies === */
+.carousel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.carousel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 visibles */
+    gap: 20px;
+    max-width: 900px;
+    overflow: hidden;
+}
+
+.carousel figure {
+    background: var(--blanco);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    text-align: center;
+    cursor: pointer;
+}
+.carousel figure:hover { transform: scale(1.05); }
+
+.carousel img { width: 100%; display: block; }
+
+.carousel figcaption {
+    padding: 10px;
+    font-weight: bold;
+    color: var(--naranja);
+}
+
+/* Botones carrusel */
+.prev, .next {
+    background: var(--amarillo);
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--negro);
+    transition: color 0.3s ease;
+}
+.prev:hover, .next:hover { color: var(--blanco); }
+
+/* === Modal (zoom/info) === */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 60px;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    text-align: center;
+}
+
+.modal img {
+    max-width: 80%;
+    border-radius: 10px;
+    box-shadow: 0 0 20px var(--amarillo);
+}
+
+#modal-caption {
+    margin-top: 15px;
+    color: var(--blanco);
+    font-size: 1.2em;
+}
+
+.close {
+    position: absolute;
+    top: 20px; right: 35px;
+    color: var(--blanco);
+    font-size: 2em;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 /* === Footer === */
@@ -119,10 +197,7 @@ footer {
     margin: 0 8px;
     transition: color 0.3s ease;
 }
-
-.footer-links a:hover {
-    color: var(--naranja);
-}
+.footer-links a:hover { color: var(--naranja); }
 
 .credits {
     margin-top: 10px;

@@ -36,19 +36,39 @@
         <p>
             Los pingüinos evolucionaron hace millones de años, adaptándose a la vida marina. 
             Sus cuerpos aerodinámicos y plumas impermeables les permiten nadar con gran velocidad en aguas heladas.
+            <img src="https://img.freepik.com/fotos-premium/ciclo-vida-pinguinos-reales-realista-pollito-huevo-adulto-e-indicando-crecimiento-flecha-arriba_636537-75719.jpg" alt="pinguino">
         </p>
     </section>
 
     <!-- Especies -->
-    <section class="especies">
-        <h2>Especies</h2>
-        <p>
-            Existen más de 18 especies de pingüinos, cada una con características únicas. 
-            Entre las más conocidas están el <strong>pingüino emperador</strong>, el <strong>pingüino rey</strong>, 
-            el <strong>pingüino de Humboldt</strong> y el <strong>pingüino azul</strong>.
-        </p>
-        <!-- Aquí puedes añadir imágenes o SVG de cada especie -->
-    </section>
+<section class="especies">
+  <h2>Especies</h2>
+  <p>Existen más de 18 especies de pingüinos...</p>
+  <div class="carousel-container">
+    <button class="prev">
+      <!-- SVG izquierda -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17 6h-6a1 1 0 0 0 -.78 .375l-4 5a1 1 0 0 0 0 1.25l4 5a1 1 0 0 0 .78 .375h6l.112 -.006a1 1 0 0 0 .669 -1.619l-3.501 -4.375l3.5 -4.375a1 1 0 0 0 -.78 -1.625z"/>
+      </svg>
+    </button>
+
+    <div class="carousel" id="carousel"></div>
+
+    <button class="next">
+      <!-- SVG derecha -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M7 6l-.112 .006a1 1 0 0 0 -.669 1.619l3.501 4.375l-3.5 4.375a1 1 0 0 0 .78 1.625h6a1 1 0 0 0 .78 -.375l4 -5a1 1 0 0 0 0 -1.25l-4 -5a1 1 0 0 0 -.78 -.375h-6z"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<!-- Modal para zoom/info -->
+<div id="modal" class="modal">
+  <span class="close">&times;</span>
+  <img id="modal-img" alt="">
+  <div id="modal-caption"></div>
+</div>
 
     <!-- Alimentación -->
     <section class="alimentacion">
@@ -90,5 +110,96 @@
         <p class="credits">Diseñado por Clara Jenhee</p>
     </div>
 </footer>
+
+<script>
+// Lista de las 18 especies de pingüinos
+const especies = [
+  { nombre: "Pingüino Emperador", img: "https://i.pinimg.com/736x/1c/2e/d9/1c2ed95083684f188e57412a26c3caf6.jpg", info: "El más grande de todos los pingüinos, habita en la Antártida." },
+  { nombre: "Pingüino Rey", img: "https://tse4.mm.bing.net/th/id/OIP.wMB-1sPEXviSFljzhdV12gHaFj?rs=1&pid=ImgDetMain&o=7&rm=3", info: "Segundo más grande, vive en islas subantárticas." },
+  { nombre: "Pingüino de Adelia", img: "https://th.bing.com/th/id/R.b9b6d7c09d40943dce45388064564a2b?rik=CItl03iPqBbHkA&pid=ImgRaw&r=0", info: "Pequeño y abundante en la Antártida." },
+  { nombre: "Pingüino Barbijo", img: "https://img.freepik.com/fotos-premium/pinguino-barbijo-isla-paulet-antartida-nombre-cientifico-pygoscelis-antarcticus_162590-7960.jpg", info: "Se distingue por la línea negra bajo su cabeza." },
+  { nombre: "Pingüino de Humboldt", img: "https://th.bing.com/th/id/R.cb167cb69012646e3726ec3716e94573?rik=5XbRMdTmwFrRDg&pid=ImgRaw&r=0", info: "Habita en las costas de Perú y Chile." },
+  { nombre: "Pingüino de Magallanes", img: "https://th.bing.com/th/id/R.b3d842d9535a284be8e4c41ba888ff4a?rik=TvnsnXMFafnLJw&pid=ImgRaw&r=0", info: "Se encuentra en Argentina y Chile." },
+  { nombre: "Pingüino de Galápagos", img: "https://th.bing.com/th/id/R.a100a8e1bc0c1dda16c86e0ab1eeb817?rik=SkZONbVYA%2bZklw&pid=ImgRaw&r=0", info: "Único que vive en el ecuador, en las Islas Galápagos." },
+  { nombre: "Pingüino Azul (Pequeño)", img: "https://tse2.mm.bing.net/th/id/OIP.KgQFRJ_BsKb5c97oBUwdNwHaFj?rs=1&pid=ImgDetMain&o=7&rm=3", info: "El más pequeño, mide apenas 40 cm." },
+  { nombre: "Pingüino de Ojos Amarillos", img: "https://th.bing.com/th/id/R.08f176d98a1be422e525058dc986861d?rik=g7iXaCaD8AHm7g&pid=ImgRaw&r=0", info: "En peligro crítico, vive en Nueva Zelanda." },
+  { nombre: "Pingüino de Fiordland", img: "https://tse3.mm.bing.net/th/id/OIP.jQO6dszjmClZUBVwGVQYMAHaE6?rs=1&pid=ImgDetMain&o=7&rm=3", info: "Habita en Nueva Zelanda, con cresta amarilla." },
+  { nombre: "Pingüino de Snares", img: "https://th.bing.com/th/id/R.9c61f345052ceb9db74ac6fec6000f33?rik=74mG62dr9G01Lw&pid=ImgRaw&r=0", info: "Endémico de las islas Snares, Nueva Zelanda." },
+  { nombre: "Pingüino Crestado (Erect-crested)", img: "https://tse2.mm.bing.net/th/id/OIP.d-hej5RA3vXMo1bLuq85SQHaE8?rs=1&pid=ImgDetMain&o=7&rm=3", info: "Se encuentra en las islas Antípodas y Bounty." },
+  { nombre: "Pingüino de Roca del Norte", img: "https://media.istockphoto.com/id/1264353764/es/foto/penguins-saltamontes-rocas-cerca-de-la-orilla-del-oc%C3%A9ano-en-las-islas-malvinas.jpg?s=612x612&w=0&k=20&c=peqf5FaE3ouVHFzAM4t_qfBEJVm9ReUFoyNsrzwAG00=", info: "Habita en islas subantárticas del Atlántico." },
+  { nombre: "Pingüino de Roca del Sur", img: "https://media.istockphoto.com/id/467084064/es/foto/ping%C3%BCino-de-roca.jpg?s=612x612&w=0&k=20&c=1S1yvvp_zmAXi7sB0ymdxcCdoYA0dQZKXJtBNSH2hTQ=", info: "Se encuentra en el sur de Nueva Zelanda." },
+  { nombre: "Pingüino Macaroni", img: "https://th.bing.com/th/id/R.b9ddb7608583681751b2d29af59f2479?rik=Os19HC%2f4anSF6Q&pid=ImgRaw&r=0", info: "Muy numeroso, con cresta amarilla distintiva." },
+  { nombre: "Pingüino Real", img: "https://cdn0.bioenciclopedia.com/es/posts/0/8/0/donde_vive_el_pinguino_real_1080_1_orig.jpg", info: "Similar al Rey, pero más pequeño." },
+  { nombre: "Pingüino de Antípodas", img: "https://www.yoigoluzygas.com/blog/embed/2c4b6ad402d4812d91b842ea3c2e716efd3a0c1680698694/Pinguinos-antipodas.jpeg?imagick=1&size=750", info: "Endémico de las islas Antípodas." },
+  { nombre: "Pingüino de las Islas Bounty", img: "https://tse2.mm.bing.net/th/id/OIP.8onW3qzJrIKP2_uR7iMOYwHaFj?rs=1&pid=ImgDetMain&o=7&rm=3", info: "Pequeña población en las islas Bounty." }
+];
+
+const carousel = document.getElementById("carousel");
+let startIndex = 0;
+const itemsPerPage = 4;
+let autoSlide;
+
+// Renderizar carrusel
+function renderCarousel() {
+  carousel.innerHTML = "";
+  const slice = especies.slice(startIndex, startIndex + itemsPerPage);
+  slice.forEach(especie => {
+    const figure = document.createElement("figure");
+    const img = document.createElement("img");
+    img.src = especie.img;
+    img.alt = especie.nombre;
+
+    const caption = document.createElement("figcaption");
+    caption.textContent = especie.nombre;
+
+    figure.appendChild(img);
+    figure.appendChild(caption);
+
+    // Abrir modal al hacer click
+    figure.addEventListener("click", () => {
+      document.getElementById("modal").style.display = "block";
+      document.getElementById("modal-img").src = especie.img;
+      document.getElementById("modal-caption").textContent = especie.nombre + " - " + especie.info;
+    });
+
+    carousel.appendChild(figure);
+  });
+}
+
+// Navegación manual
+document.querySelector(".prev").addEventListener("click", () => {
+  startIndex = (startIndex - itemsPerPage + especies.length) % especies.length;
+  renderCarousel();
+  resetAutoSlide();
+});
+document.querySelector(".next").addEventListener("click", () => {
+  startIndex = (startIndex + itemsPerPage) % especies.length;
+  renderCarousel();
+  resetAutoSlide();
+});
+
+// Modal cerrar
+document.querySelector(".close").addEventListener("click", () => {
+  document.getElementById("modal").style.display = "none";
+});
+
+// Auto slide
+function startAutoSlide() {
+  autoSlide = setInterval(() => {
+    startIndex = (startIndex + itemsPerPage) % especies.length;
+    renderCarousel();
+  }, 4000); // cada 4 segundos
+}
+function resetAutoSlide() {
+  clearInterval(autoSlide);
+  startAutoSlide();
+}
+
+// Inicializar
+renderCarousel();
+startAutoSlide();
+</script>
+
+
 </body>
 </html>
